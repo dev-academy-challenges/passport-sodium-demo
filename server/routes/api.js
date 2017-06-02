@@ -2,7 +2,6 @@ const bodyParser = require('body-parser')
 const express = require('express')
 const verifyJwt = require('express-jwt')
 const users = require('../lib/users')
-
 const auth = require('../lib/auth.js')
 
 const router = express.Router()
@@ -27,7 +26,9 @@ function register (req, res, next) {
       users.create(req.body.username, req.body.password)
         .then(() => next())
     })
-    .catch(() => next())
+    .catch((err) => {
+      res.status(400).send({ message: err.message })
+    })
 }
 
 // express-jwt middleware lets us use a function as the secret,
