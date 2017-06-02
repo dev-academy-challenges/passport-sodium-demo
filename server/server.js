@@ -1,5 +1,4 @@
 const express = require('express')
-const flash = require('connect-flash')
 const hbs = require('express-handlebars')
 const LocalStrategy = require('passport-local')
 const FacebookStrategy = require('passport-facebook')
@@ -8,13 +7,9 @@ const path = require('path')
 
 const auth = require('./lib/auth')
 const users = require('./lib/users')
-const session = require('./lib/session')
+// const session = require('./lib/session')
 
-// jwt
 const apiRoutes = require('./routes/api')
-
-// sessions / cookies
-const indexRoutes = require('./routes')
 
 const app = express()
 
@@ -22,16 +17,12 @@ app.engine('hbs', hbs())
 app.set('view engine', 'hbs')
 app.set('views', path.join(__dirname, 'views'))
 
-app.use(session)
-app.use(flash())
+// app.use(session)
 app.use(express.static('public'))
-// include the next line for client side, comment for server side
-app.use(express.static('static'))
 app.use(passport.initialize())
-app.use(passport.session())
+// app.use(passport.session())
 
-app.use('/', indexRoutes) // this uses cookies!! -- example of server side
-app.use('/api/', apiRoutes) // this uses jwt!! -- example of client side
+app.use('/api/', apiRoutes) 
 
 passport.use(new LocalStrategy(auth.verify))
 passport.use(new FacebookStrategy(auth.facebookOptions, auth.facebookVerify))

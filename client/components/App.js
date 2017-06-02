@@ -1,0 +1,16 @@
+import React, { Component } from 'react'
+import Navbar from './Navbar'
+import Quote from './Quote'
+
+export default class App extends Component {
+  render() {
+    return (
+      <div>
+        <Navbar />
+        <div className='container'>
+          <Quote />
+        </div>
+      </div>
+    )
+  }
+}

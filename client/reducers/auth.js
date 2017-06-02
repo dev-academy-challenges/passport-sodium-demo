@@ -1,39 +1,58 @@
 import {
-  LOGIN_REQUEST, LOGIN_SUCCESS, LOGIN_FAILURE, LOGOUT_SUCCESS
+  LOGIN_REQUEST, LOGIN_SUCCESS, LOGIN_FAILURE, LOGOUT_SUCCESS, REGISTER_REQUEST, REGISTER_FAILURE
 } from '../actions'
+import { isAuthenticated, getUserTokenInfo } from '../utils/auth'
 
+const initialState = {
+  isFetching: false,
+  isAuthenticated: isAuthenticated(),
+  user: getUserTokenInfo(),
+  errorMessage: ''
+}
 
-// The auth reducer. The starting state sets authentication
-// based on a token being in local storage. In a real app,
-// we would also want a util to check if the token is expired.
-export default function auth(state = {
-    isFetching: false,
-    isAuthenticated: localStorage.getItem('token') ? true : false
-  }, action) {
+export default function auth(state = initialState, action) {
   switch (action.type) {
     case LOGIN_REQUEST:
-      return Object.assign({}, state, {
+      return {
+        ...state, 
         isFetching: true,
         isAuthenticated: false,
-        user: action.creds
-      })
+        errorMessage: ''
+      }
     case LOGIN_SUCCESS:
-      return Object.assign({}, state, {
+      return {
+        ...state,
         isFetching: false,
         isAuthenticated: true,
-        errorMessage: ''
-      })
+        user: action.user
+      }
     case LOGIN_FAILURE:
-      return Object.assign({}, state, {
+      return {
+        ...state,
         isFetching: false,
         isAuthenticated: false,
         errorMessage: action.message
-      })
+      }
     case LOGOUT_SUCCESS:
-      return Object.assign({}, state, {
+      return {
+        ...state,
         isFetching: true,
         isAuthenticated: false
-      })
+      }
+    case REGISTER_REQUEST:
+      return {
+        ...state,
+        isFetching: true,
+        isAuthenticated: false,
+        errorMessage: ''
+      }
+    case REGISTER_FAILURE:
+      return {
+        ...state,
+        isFetching: false,
+        isAuthenticated: false,
+        errorMessage: action.message
+      }
     default:
       return state
   }

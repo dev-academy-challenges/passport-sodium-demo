@@ -1,9 +1,11 @@
 import React, { Component, PropTypes } from 'react'
-import Login from './Login'
+import { connect } from 'react-redux'
+import LoginForm from './LoginForm'
 import Logout from './Logout'
+import RegisterForm from './RegisterForm'
 import { loginUser, logoutUser } from '../actions'
 
-export default class Navbar extends Component {
+class Navbar extends Component {
 
   render() {
     const { dispatch, isAuthenticated, errorMessage } = this.props
@@ -11,11 +13,11 @@ export default class Navbar extends Component {
     return (
       <nav className='navbar navbar-default'>
         <div className='container-fluid'>
-          <a className="navbar-brand" href="#">Quotes App</a>
+          <a className="navbar-brand" href="#">Quote App</a>
           <div className='navbar-form'>
 
             {!isAuthenticated &&
-              <Login
+              <LoginForm
                 errorMessage={errorMessage}
                 onLoginClick={ creds => dispatch(loginUser(creds)) }
               />
@@ -24,6 +26,8 @@ export default class Navbar extends Component {
             {isAuthenticated &&
               <Logout onLogoutClick={() => dispatch(logoutUser())} />
             }
+
+            <RegisterForm />
 
           </div>
         </div>
@@ -38,3 +42,11 @@ Navbar.propTypes = {
   isAuthenticated: PropTypes.bool.isRequired,
   errorMessage: PropTypes.string
 }
+
+const mapStateToProps = (state) => {
+  return {
+    isAuthenticated: state.auth.isAuthenticated
+  }
+}
+
+export default connect(mapStateToProps)(Navbar)

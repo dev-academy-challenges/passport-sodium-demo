@@ -1,6 +1,51 @@
-// actions.js
-import request from 'superagent'
-import { CALL_API } from '../middleware/api'
+import request from '../utils/api'
+import { saveUserToken, removeUser } from '../utils/auth'
+
+export const REGISTER_REQUEST = 'REGISTER_REQUEST'
+export const REGISTER_FAILURE = 'REGISTER_FAILURE'
+
+function requestRegister(creds) {
+  return {
+    type: REGISTER_REQUEST,
+    isFetching: true,
+    isAuthenticated: false,
+    creds
+  }
+}
+
+export function registerError(message) {
+  return {
+    type: REGISTER_FAILURE,
+    isFetching: false,
+    isAuthenticated: false,
+    message
+  }
+}
+
+export function registerUser (creds) {
+    return dispatch => {
+    // We dispatch requestLogin to kickoff the call to the API
+    dispatch(requestRegister(creds))
+
+    return request('post', '/register', creds)
+      .then((response) =>  {
+        if (!response.ok) {
+          // If there was a problem, we want to
+          // dispatch the error condition
+          dispatch(registerError(response.body.message))
+          return Promise.reject(response.body.message)
+        } else {
+          // If login was successful, set the token in local storage
+          const userInfo = saveUserToken(response.body.token)
+          // Dispatch the success action
+          dispatch(receiveLogin(userInfo))
+        }
+      }).catch(err => 
+        dispatch(registerError(err.response.body.message))
+      )
+  }
+}
+
 
 // There are three possible states for our login
 // process and we need actions for each of them
@@ -8,12 +53,11 @@ export const LOGIN_REQUEST = 'LOGIN_REQUEST'
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS'
 export const LOGIN_FAILURE = 'LOGIN_FAILURE'
 
-function requestLogin(creds) {
+function requestLogin() {
   return {
     type: LOGIN_REQUEST,
     isFetching: true,
     isAuthenticated: false,
-    creds
   }
 }
 
@@ -22,7 +66,7 @@ function receiveLogin(user) {
     type: LOGIN_SUCCESS,
     isFetching: false,
     isAuthenticated: true,
-    token: user.token
+    user
   }
 }
 
@@ -41,10 +85,8 @@ export function loginUser(creds) {
   return dispatch => {
     // We dispatch requestLogin to kickoff the call to the API
     dispatch(requestLogin(creds))
-    
-    return request.post('http://localhost:3000/api/authenticate')
-      .set({ 'Content-Type':'application/x-www-form-urlencoded' })
-      .send(`username=${creds.username}&password=${creds.password}`)
+
+    return request('post', '/authenticate', creds)
       .then((response) =>  {
         if (!response.ok) {
           // If there was a problem, we want to
@@ -53,11 +95,11 @@ export function loginUser(creds) {
           return Promise.reject(response.body.message)
         } else {
           // If login was successful, set the token in local storage
-          localStorage.setItem('token', response.body.token)
+         const userInfo = saveUserToken(response.body.token)
           // Dispatch the success action
-          dispatch(receiveLogin(response.body))
+          dispatch(receiveLogin(userInfo))
         }
-      }).catch(err => console.log("Error: ", err))
+      }).catch(err => dispatch(loginError(err.response.body.message)))
   }
 }
 
@@ -85,7 +127,7 @@ function receiveLogout() {
 export function logoutUser() {
   return dispatch => {
     dispatch(requestLogout())
-    localStorage.removeItem('token')
+    removeUser()
     dispatch(receiveLogout())
   }
 }
@@ -95,24 +137,47 @@ export const QUOTE_SUCCESS = 'QUOTE_SUCCESS'
 export const QUOTE_FAILURE = 'QUOTE_FAILURE'
 
 // Uses the API middlware to get a quote
-export function fetchQuote() {
-  return {
-    [CALL_API]: {
-      endpoint: 'quote',
-      types: [QUOTE_REQUEST, QUOTE_SUCCESS, QUOTE_FAILURE]
-    }
+export function fetchQuote () {
+  return function (dispatch) {
+    dispatch(requestQuote())
+    request('get', '/quote')
+    .then(res => {
+      dispatch(receiveQuote(res.body.message))
+    })
+    .catch(err => dispatch(quoteError(err.response.body.message)))
   }
 }
 
-// Same API middlware is used to get a
-// secret quote, but we set authenticated
-// to true so that the auth header is sent
-export function fetchSecretQuote() {
+export function fetchSecretQuote () {
+  return function (dispatch) {
+    dispatch(requestQuote())
+    request('get', '/quote')
+    .then(res => {
+      dispatch(receiveQuote(res.body.message))
+    })
+    .catch(err => dispatch(quoteError(err.response.body.message)))
+  }
+}
+
+export function receiveQuote (quote) {
   return {
-    [CALL_API]: {
-      endpoint: 'secret',
-      authenticated: true,
-      types: [QUOTE_REQUEST, QUOTE_SUCCESS, QUOTE_FAILURE]
-    }
+    type: QUOTE_SUCCESS,
+    isFetching: false,
+    response: quote
+  }
+}
+
+function requestQuote() {
+  return {
+    type: QUOTE_REQUEST,
+    isFetching: true,
+  }
+}
+
+function quoteError(message) {
+  return {
+    type: QUOTE_FAILURE,
+    isFetching: false,
+    message
   }
 }
