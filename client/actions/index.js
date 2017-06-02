@@ -151,7 +151,7 @@ export function fetchQuote () {
 export function fetchSecretQuote () {
   return function (dispatch) {
     dispatch(requestQuote())
-    request('get', '/quote')
+    request('get', '/secret')
     .then(res => {
       dispatch(receiveQuote(res.body.message))
     })
