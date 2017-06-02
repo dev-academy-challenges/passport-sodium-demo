@@ -1,14 +1,12 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import LoginForm from './LoginForm'
 import Logout from './Logout'
 import RegisterForm from './RegisterForm'
-import { loginUser, logoutUser } from '../actions'
 
 class Navbar extends Component {
-
   render() {
-    const { dispatch, isAuthenticated, errorMessage } = this.props
+    const { isAuthenticated } = this.props
 
     return (
       <nav className='navbar navbar-default'>
@@ -17,14 +15,11 @@ class Navbar extends Component {
           <div className='navbar-form'>
 
             {!isAuthenticated &&
-              <LoginForm
-                errorMessage={errorMessage}
-                onLoginClick={ creds => dispatch(loginUser(creds)) }
-              />
+              <LoginForm />
             }
 
             {isAuthenticated &&
-              <Logout onLogoutClick={() => dispatch(logoutUser())} />
+              <Logout />
             }
 
             <RegisterForm />
@@ -35,12 +30,6 @@ class Navbar extends Component {
     )
   }
 
-}
-
-Navbar.propTypes = {
-  dispatch: PropTypes.func.isRequired,
-  isAuthenticated: PropTypes.bool.isRequired,
-  errorMessage: PropTypes.string
 }
 
 const mapStateToProps = (state) => {
