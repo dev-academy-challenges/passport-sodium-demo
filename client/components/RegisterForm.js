@@ -17,7 +17,6 @@ class RegisterForm extends Component {
       }
     }
     this.handleChange = this.handleChange.bind(this)
-    this.resetFields = this.resetFields.bind(this)
   }
 
   handleChange (e) {
@@ -37,17 +36,6 @@ class RegisterForm extends Component {
     }
     const creds = { username: username.trim(), password: password.trim() }
     this.props.registerUser(creds)
-      .then(this.resetFields)
-  }
-
-  resetFields () {
-    this.setState({
-      fields: {
-        username: '',
-        password: '',
-        confirm: ''
-      }
-    })
   }
 
   render() {

@@ -13,6 +13,7 @@ class LoginForm extends Component {
         password: ''
       }
     }
+    this.handleChange = this.handleChange.bind(this)
   }
 
   handleChange (e) {
@@ -22,6 +23,12 @@ class LoginForm extends Component {
         [e.target.name]: e.target.value
       }
     })
+  }
+
+  handleClick(event) {
+    const { username, password } = this.state.fields
+    const creds = { username: username.trim(), password: password.trim() }
+    this.props.loginUser(creds)
   }
 
   render() {
@@ -37,17 +44,12 @@ class LoginForm extends Component {
     )
   }
 
-  handleClick(event) {
-    const { username, password } = this.state.fields
-    const creds = { username: username.value.trim(), password: password.value.trim() }
-    this.props.loginUser(creds)
-  }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
     loginUser: (creds) => {
-      dispatch(loginUser(creds))
+      return dispatch(loginUser(creds))
     }
   }
 }

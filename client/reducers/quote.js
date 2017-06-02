@@ -14,6 +14,7 @@ export default function quote(state = initialState, action) {
       return {
         ...state,
         isFetching: true,
+        quote: '',
         errorMessage: ''
       }
     case QUOTE_SUCCESS:

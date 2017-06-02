@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import Loading from './Loading'
 import ErrorMessage from './ErrorMessage'
 import { fetchQuote, fetchSecretQuote } from '../actions'
 
 class Quote extends Component {
   render() {
-    const { onQuoteClick, onSecretQuoteClick, isAuthenticated, quote } = this.props
+    const { onQuoteClick, onSecretQuoteClick, quote } = this.props
 
     return (
       <div>
@@ -23,7 +24,7 @@ class Quote extends Component {
 
         <div className='col-sm-6'>
 
-          { quote && isAuthenticated &&
+          { quote &&
             <div>
               <span className="label label-danger">Quote</span>
               <hr/>
@@ -32,6 +33,8 @@ class Quote extends Component {
               </blockquote>
             </div>
           }
+
+          <Loading reducer="quote" />
 
           <ErrorMessage reducer="quote" />
 
